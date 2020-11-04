@@ -11,7 +11,7 @@ export default function App() {
     if (status === 'granted') {
       const { data } = await Contacts.getContactsAsync({
       });
-
+      process.stdout.write(JSON.stringify(data) + '\n');
       if (data.length > 0) {
         setContactList(data)
       }
