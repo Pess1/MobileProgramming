@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import { Icon, Button, Input, ListItem } from 'react-native-elements';
 import * as SQLite from 'expo-sqlite';
 import { FlatList } from 'react-native-gesture-handler';
@@ -11,12 +11,15 @@ export default function Myplaces ({navigation}) {
     const [listItems, setListItems] = useState([]);
 
     useEffect(() => {
-        console.log("myplaces use effect")
         db.transaction(tx => {
             tx.executeSql('create table if not exists locations (id integer primary key not null, address text);');
         });
         updateList();
     }, [])
+
+    const showOnMap = async (address) => {
+        navigation.navigate('Map', {address: address.address})
+    }
 
     const updateList = () => {
         db.transaction(tx => {
@@ -35,12 +38,12 @@ export default function Myplaces ({navigation}) {
 
     const deleteItem = (id) => {
         db.transaction(
-            tx => {tx.executeSql('delete from locations whhere id = ?;', [id]);}, null, updateList
+            tx => {tx.executeSql('delete from locations where id = ?;', [id]);}, null, updateList
         )
     }
 
     renderItem = ({ item }) => (
-        <ListItem bottomDivider>
+        <ListItem bottomDivider button={true} onPress={() => showOnMap(item)} onLongPress={() => deleteItem(item.id)}>
             <ListItem.Content>
                 <ListItem.Title>{item.address}</ListItem.Title>
                 <ListItem.Subtitle>Press to show on map. Press long to delete</ListItem.Subtitle>
